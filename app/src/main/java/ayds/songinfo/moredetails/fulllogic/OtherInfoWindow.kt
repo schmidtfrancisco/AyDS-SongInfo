@@ -20,13 +20,17 @@ import java.io.IOException
 import java.util.Locale
 
 private const val AUDIOSCROBBLER_URL = "https://ws.audioscrobbler.com/2.0/"
-private const val LOGO_IMAGE_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
+private const val LASTFM_LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
+private const val BIOGRAPHY = "bio"
+private const val ARTIST = "artist"
+private const val CONTENT = "content"
+private const val ARTICLE_URL = "url"
+private const val NO_RESULTS = "No Results"
 
 class OtherInfoWindow : Activity() {
     private lateinit var artistInfoTextView: TextView
     private lateinit var dataBase: ArticleDatabase
     private lateinit var lastFMAPI: LastFMAPI
-    private lateinit var artistName: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,12 +49,6 @@ class OtherInfoWindow : Activity() {
             ArticleDatabase::class.java,
             "article-database"
         ).build()
-
-        Thread {
-            dataBase.ArticleDao().insertArticle(ArticleEntity("test", "sarasa", ""))
-            Log.e("TAG", "" + dataBase.ArticleDao().getArticleByArtistName("test"))
-            Log.e("TAG", "" + dataBase.ArticleDao().getArticleByArtistName("nada"))
-        }.start()
     }
 
     private fun initLastFMAPI(){
@@ -63,63 +61,59 @@ class OtherInfoWindow : Activity() {
     }
 
     private fun showArtistInfo(){
-        val artist = intent.getStringExtra(ARTIST_NAME_EXTRA)
-        if (artist != null) {
-            artistName = artist
-            getArtistInfo()
+        val artistName = intent.getStringExtra(ARTIST_NAME_EXTRA)
+        if (artistName != null) {
+            getArtistInfo(artistName)
         }
-        else
-            updateArtistInfoText("No Results")
     }
 
-    private fun getArtistInfo() = Thread {
+    private fun getArtistInfo(artistName: String) = Thread {
         var article = dataBase.ArticleDao().getArticleByArtistName(artistName)
         when {
             article != null -> updateLocalArtistInfo(article)
 
             else -> {
-                try {
-                    article = getArticleFromService()
+                article = getArticleFromService(artistName)
 
-                    if (article != null){
-                        updateExternalArtistInfo(article)
-                        dataBase.ArticleDao().insertArticle(article)
+                article?.let {
+                    if (it.biography != NO_RESULTS) {
+                        dataBase.ArticleDao().insertArticle(it)
                     }
-                    else
-                        updateArtistInfoText("No Results")
-
-                } catch (e: IOException) {
-                    Log.e("TAG", "Error $e")
-                    e.printStackTrace()
                 }
+                updateExternalArtistInfo(article)
             }
         }
     }.start()
 
-    private fun getArticleFromService(): ArticleEntity? {
-        val callResponse = lastFMAPI.getArtistInfo(artistName).execute()
-        return jsonToArticle(callResponse.body())
-    }
+    private fun getArticleFromService(artistName: String): ArticleEntity? =
+        try {
+            val callResponse = lastFMAPI.getArtistInfo(artistName).execute()
+            jsonToArticle(callResponse.body(), artistName)
+        }catch (e: IOException){
+            Log.e("TAG", "Error $e")
+            e.printStackTrace()
+            null
+        }
 
-    private fun jsonToArticle(serviceData: String?): ArticleEntity? {
+
+    private fun jsonToArticle(serviceData: String?, artistName: String): ArticleEntity {
         Log.e("TAG", "JSON $serviceData")
         val gson = Gson()
         val jsonObject = gson.fromJson(serviceData, JsonObject::class.java)
 
-        val artist = jsonObject["artist"].getAsJsonObject()
-        val biography = artist["bio"].getAsJsonObject()
-        val extract = biography["content"]
-        val url = artist["url"]
+        val artist = jsonObject[ARTIST].getAsJsonObject()
+        val biography = artist[BIOGRAPHY].getAsJsonObject()
+        val extract = biography[CONTENT]
+        val url = artist[ARTICLE_URL]
 
-        return when {
-            extract != null -> {
-                var biographyContent = extract.asString.replace("\\n", "\n")
-                biographyContent = textToHtml(biographyContent, artistName)
+        var biographyContent: String = NO_RESULTS
 
-                ArticleEntity(artistName, biographyContent, url.asString)
-            }
-            else -> null
+        if (extract != null) {
+            biographyContent = extract.asString.replace("\\n", "\n")
+            biographyContent = textToHtml(biographyContent, artistName)
         }
+
+        return ArticleEntity(artistName, biographyContent, url.asString)
 
     }
 
@@ -144,9 +138,16 @@ class OtherInfoWindow : Activity() {
         updateButtonAction(article.articleUrl)
     }
 
-    private fun updateExternalArtistInfo(article: ArticleEntity){
-        updateArtistInfoText(article.biography)
-        updateButtonAction(article.articleUrl)
+    private fun updateExternalArtistInfo(article: ArticleEntity?){
+        when {
+            article != null -> {
+                updateArtistInfoText(article.biography)
+                updateButtonAction(article.articleUrl)
+            }
+            else -> {
+                updateArtistInfoText(NO_RESULTS)
+            }
+        }
     }
 
     private fun updateArtistInfoText(artistText: String){
@@ -162,9 +163,9 @@ class OtherInfoWindow : Activity() {
         }
     }
     private fun showLogoImage(){
-        Log.e("TAG", "Get Image from $LOGO_IMAGE_URL")
+        Log.e("TAG", "Get Image from $LASTFM_LOGO_URL")
         runOnUiThread {
-            Picasso.get().load(LOGO_IMAGE_URL).into(findViewById<View>(R.id.imageView1) as ImageView)
+            Picasso.get().load(LASTFM_LOGO_URL).into(findViewById<View>(R.id.imageView1) as ImageView)
         }
     }
 
