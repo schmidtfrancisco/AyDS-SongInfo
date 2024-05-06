@@ -1,8 +1,8 @@
-package ayds.songinfo.moredetails.fulllogic.dependencyinjector
+package ayds.songinfo.moredetails.dependencyinjector
 
 import android.content.Intent
-import ayds.songinfo.moredetails.fulllogic.presentation.MoreDetailsPresenter
-import ayds.songinfo.moredetails.fulllogic.presentation.MoreDetailsPresenterImpl
+import ayds.songinfo.moredetails.presentation.MoreDetailsPresenter
+import ayds.songinfo.moredetails.presentation.MoreDetailsPresenterImpl
 
 object MoreDetailsPresenterInjector {
     private lateinit var moreDetailsPresenter: MoreDetailsPresenter
@@ -10,7 +10,8 @@ object MoreDetailsPresenterInjector {
     fun getMoreDetailsPresenter(): MoreDetailsPresenter = moreDetailsPresenter
 
     fun initMoreDetailsPresenter(intent: Intent){
-        val artistBiographyRepository = MoreDetailsDataInjector.getArtistBiographyRepository()
+        val artistBiographyRepository =
+            ArtistBiographyRepositoryInjector.getArtistBiographyRepository()
         moreDetailsPresenter = MoreDetailsPresenterImpl(artistBiographyRepository, intent)
     }
 

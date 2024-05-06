@@ -1,6 +1,6 @@
-package ayds.songinfo.moredetails.fulllogic.data.external
+package ayds.songinfo.moredetails.data.external
 
-import ayds.songinfo.moredetails.fulllogic.domain.Biography.ArtistBiography
+import ayds.songinfo.moredetails.domain.Biography.ArtistBiography
 import retrofit2.Response
 
 

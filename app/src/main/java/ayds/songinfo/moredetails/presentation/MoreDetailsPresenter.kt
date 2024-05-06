@@ -1,12 +1,12 @@
-package ayds.songinfo.moredetails.fulllogic.presentation
+package ayds.songinfo.moredetails.presentation
 
 import android.content.Intent
 import ayds.observer.Observable
 import ayds.observer.Subject
-import ayds.songinfo.moredetails.fulllogic.domain.ArtistBiographyRepository
-import ayds.songinfo.moredetails.fulllogic.domain.Biography
-import ayds.songinfo.moredetails.fulllogic.domain.Biography.ArtistBiography
-import ayds.songinfo.moredetails.fulllogic.domain.Biography.EmptyBiography
+import ayds.songinfo.moredetails.domain.ArtistBiographyRepository
+import ayds.songinfo.moredetails.domain.Biography
+import ayds.songinfo.moredetails.domain.Biography.ArtistBiography
+import ayds.songinfo.moredetails.domain.Biography.EmptyBiography
 import java.util.Locale
 
 interface MoreDetailsPresenter {
@@ -28,7 +28,6 @@ internal class MoreDetailsPresenterImpl(
     override fun manageEvent(event: MoreDetailsUIEvent) {
         when (event){
             MoreDetailsUIEvent.OpenWindow -> getArtistInfo()
-            else -> throw Exception("Unhandled event")
         }
     }
     
@@ -51,7 +50,7 @@ internal class MoreDetailsPresenterImpl(
 
     private fun presentArtistBiography(artistBiography: ArtistBiography){
         uiState = uiState.copy(
-            biographyText = parseText(artistBiography.content, artistBiography.artistName),
+            biographyText = parseText(artistBiography),
             articleUrl = artistBiography.articleUrl,
         )
         uiStateObservable.notify(uiState)
@@ -59,15 +58,16 @@ internal class MoreDetailsPresenterImpl(
 
     private fun presentEmptyBiography(){
         uiState = uiState.copy(
-            biographyText = parseText("No results found", null),
+            biographyText = textToHtml("No results found", null),
             articleUrl = "",
         )
         uiStateObservable.notify(uiState)
     }
 
-    private fun parseText(text: String, term: String?): String{
+    private fun parseText(artistBiography: ArtistBiography): String{
+        val text = (if (artistBiography.isLocallyStored) "[*]" else "") + artistBiography.content
         val parsedText = text.replace("\\n", "\n")
-        return textToHtml(parsedText, term)
+        return textToHtml(parsedText, artistBiography.artistName)
     }
 
     private fun textToHtml(text: String, term: String?): String {

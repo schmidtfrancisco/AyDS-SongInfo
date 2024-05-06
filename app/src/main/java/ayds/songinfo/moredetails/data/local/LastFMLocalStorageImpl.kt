@@ -1,9 +1,9 @@
-package ayds.songinfo.moredetails.fulllogic.data.local
+package ayds.songinfo.moredetails.data.local
 
-import ayds.songinfo.moredetails.fulllogic.domain.Biography.ArtistBiography
+import ayds.songinfo.moredetails.domain.Biography.ArtistBiography
 
 class LastFMLocalStorageImpl(
-    private var database: ArtistBiographyDatabase
+    database: ArtistBiographyDatabase
 ): LastFMLocalStorage {
 
     private val artistBiographyDao: ArtistBiographyDao = database.artistBiographyDao()

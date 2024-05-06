@@ -1,9 +1,9 @@
-package ayds.songinfo.moredetails.fulllogic.data.local
+package ayds.songinfo.moredetails.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import ayds.songinfo.moredetails.fulllogic.data.local.ArtistBiographyDao
-import ayds.songinfo.moredetails.fulllogic.data.local.ArtistBiographyEntity
+import ayds.songinfo.moredetails.data.local.ArtistBiographyDao
+import ayds.songinfo.moredetails.data.local.ArtistBiographyEntity
 
 @Database(entities = [ArtistBiographyEntity::class], version = 1)
 abstract class ArtistBiographyDatabase: RoomDatabase() {

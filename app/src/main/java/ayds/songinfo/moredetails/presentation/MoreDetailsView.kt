@@ -1,4 +1,4 @@
-package ayds.songinfo.moredetails.fulllogic.presentation
+package ayds.songinfo.moredetails.presentation
 
 import android.app.Activity
 import android.content.Intent
@@ -9,13 +9,12 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import ayds.songinfo.R
-import ayds.songinfo.moredetails.fulllogic.dependencyinjector.MoreDetailsPresenterInjector
-import ayds.songinfo.moredetails.fulllogic.dependencyinjector.MoreDetailsViewInjector
+import ayds.songinfo.moredetails.dependencyinjector.MoreDetailsPresenterInjector
+import ayds.songinfo.moredetails.dependencyinjector.MoreDetailsViewInjector
 import com.squareup.picasso.Picasso
 
 
 private const val LASTFM_LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
-
 
 class MoreDetailsActivity: Activity() {
 
@@ -32,7 +31,7 @@ class MoreDetailsActivity: Activity() {
         initModule()
         initProperties()
         initObservers()
-        getArtistInfo()
+        getArtistBiographyInfo()
         showLogoImage()
     }
 
@@ -49,14 +48,14 @@ class MoreDetailsActivity: Activity() {
 
     private fun initObservers(){
         moreDetailsPresenter.uiStateObservable.
-            subscribe{value -> updateBiographyInfo(value)}
+            subscribe{value -> updateArtistBiographyInfo(value)}
     }
 
-    private fun getArtistInfo(){
+    private fun getArtistBiographyInfo(){
         moreDetailsPresenter.manageEvent(MoreDetailsUIEvent.OpenWindow)
     }
 
-    private fun updateBiographyInfo(uiState: MoreDetailsUIState){
+    private fun updateArtistBiographyInfo(uiState: MoreDetailsUIState){
         runOnUiThread {
             updateArtistBiographyText(uiState.biographyText)
             updateOpenUrlButtonListener(uiState.articleUrl)

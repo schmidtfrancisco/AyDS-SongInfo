@@ -1,13 +1,11 @@
-package ayds.songinfo.moredetails.fulllogic.data
+package ayds.songinfo.moredetails.data
 
-import ayds.songinfo.moredetails.fulllogic.data.external.LastFMExternalService
-import ayds.songinfo.moredetails.fulllogic.data.local.LastFMLocalStorage
-import ayds.songinfo.moredetails.fulllogic.domain.ArtistBiographyRepository
-import ayds.songinfo.moredetails.fulllogic.domain.Biography
-import ayds.songinfo.moredetails.fulllogic.domain.Biography.EmptyBiography
-import ayds.songinfo.moredetails.fulllogic.domain.Biography.ArtistBiography
-
-private const val NO_RESULTS = "No Results"
+import ayds.songinfo.moredetails.data.external.LastFMExternalService
+import ayds.songinfo.moredetails.data.local.LastFMLocalStorage
+import ayds.songinfo.moredetails.domain.ArtistBiographyRepository
+import ayds.songinfo.moredetails.domain.Biography
+import ayds.songinfo.moredetails.domain.Biography.EmptyBiography
+import ayds.songinfo.moredetails.domain.Biography.ArtistBiography
 
 internal class ArtistBiographyRepositoryImpl(
     private val lastFMLocalStorage: LastFMLocalStorage,
@@ -16,14 +14,16 @@ internal class ArtistBiographyRepositoryImpl(
 
     override fun getBiographyByArtistName(artistName: String): Biography {
         var artistBiography = lastFMLocalStorage.getBiographyByArtistName(artistName)
-        artistBiography?.markItAsLocal()
 
-        if (artistBiography == null){
+        if (artistBiography != null) {
+            markArtistBiographyAsLocal(artistBiography)
+        }
+        else {
             try {
                 artistBiography = lastFMExternalService.getArtistBiography(artistName)
 
                 artistBiography?.let {
-                    if (it.content != NO_RESULTS) {
+                    if (it.content != LastFMExternalService.NO_CONTENT) {
                         lastFMLocalStorage.insertArtistBiography(it)
                     }
                 }
@@ -34,6 +34,8 @@ internal class ArtistBiographyRepositoryImpl(
         return artistBiography ?: EmptyBiography
     }
 
-    private fun ArtistBiography.markItAsLocal() = copy(content = "[*]$content")
+    private fun markArtistBiographyAsLocal(artistBiography: ArtistBiography){
+        artistBiography.isLocallyStored = true
+    }
 }
 

@@ -1,19 +1,21 @@
-package ayds.songinfo.moredetails.fulllogic.data.external
+package ayds.songinfo.moredetails.data.external
 
-import ayds.songinfo.moredetails.fulllogic.domain.Biography.ArtistBiography
+import ayds.songinfo.moredetails.domain.Biography.ArtistBiography
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 
 
 interface LastFMToBiographyResolver{
     fun getArtistBioFromExternalData(serviceData: String?, artistName: String): ArtistBiography?
+
+
 }
 
 private const val BIOGRAPHY = "bio"
 private const val ARTIST = "artist"
 private const val CONTENT = "content"
 private const val ARTICLE_URL = "url"
-private const val NO_RESULTS = "No Results"
+
 
 internal class JsonToBiographyResolver: LastFMToBiographyResolver {
 
@@ -28,7 +30,6 @@ internal class JsonToBiographyResolver: LastFMToBiographyResolver {
             null
         }
 
-
     private fun String?.getJsonObject(): JsonObject {
         val gson = Gson()
         return gson.fromJson(this, JsonObject::class.java)
@@ -38,11 +39,13 @@ internal class JsonToBiographyResolver: LastFMToBiographyResolver {
         val artist = this[ARTIST].getAsJsonObject()
         val biography = artist[BIOGRAPHY].getAsJsonObject()
         val extract = biography[CONTENT]
-        return extract?.asString ?: NO_RESULTS
+        return extract?.asString ?: LastFMExternalService.NO_CONTENT
     }
 
     private fun JsonObject.getArticleUrl(): String {
         val artist = this[ARTIST].getAsJsonObject()
         return artist[ARTICLE_URL].asString
     }
+
+
 }

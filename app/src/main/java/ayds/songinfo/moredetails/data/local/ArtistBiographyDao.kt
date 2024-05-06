@@ -1,10 +1,10 @@
-package ayds.songinfo.moredetails.fulllogic.data.local
+package ayds.songinfo.moredetails.data.local
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import ayds.songinfo.moredetails.fulllogic.data.local.ArtistBiographyEntity
+import ayds.songinfo.moredetails.data.local.ArtistBiographyEntity
 
 @Dao
 interface ArtistBiographyDao {
