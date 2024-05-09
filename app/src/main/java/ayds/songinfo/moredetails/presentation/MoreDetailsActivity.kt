@@ -9,12 +9,9 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import ayds.songinfo.R
-import ayds.songinfo.moredetails.dependencyinjector.MoreDetailsPresenterInjector
-import ayds.songinfo.moredetails.dependencyinjector.MoreDetailsViewInjector
+import ayds.songinfo.moredetails.dependencyinjector.MoreDetailsInjector
 import com.squareup.picasso.Picasso
 
-
-private const val LASTFM_LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
 
 class MoreDetailsActivity: Activity() {
 
@@ -31,13 +28,12 @@ class MoreDetailsActivity: Activity() {
         initModule()
         initProperties()
         initObservers()
-        getArtistBiographyInfo()
-        showLogoImage()
+        getArtistInfoAsync()
     }
 
     private fun initModule(){
-        MoreDetailsViewInjector.init(this)
-        moreDetailsPresenter = MoreDetailsPresenterInjector.getMoreDetailsPresenter()
+        MoreDetailsInjector.init(this)
+        moreDetailsPresenter = MoreDetailsInjector.getMoreDetailsPresenter()
     }
 
     private fun initProperties(){
@@ -48,22 +44,32 @@ class MoreDetailsActivity: Activity() {
 
     private fun initObservers(){
         moreDetailsPresenter.uiStateObservable.
-            subscribe{value -> updateArtistBiographyInfo(value)}
+        subscribe{value -> updateArtistBiographyInfo(value)}
     }
 
-    private fun getArtistBiographyInfo(){
-        moreDetailsPresenter.manageEvent(MoreDetailsUIEvent.OpenWindow)
+    private fun getArtistInfoAsync(){
+        Thread{
+            getArtistInfo()
+        }.start()
     }
+
+    private fun getArtistInfo(){
+        val artistName = getArtistName()
+        moreDetailsPresenter.getArtistInfo(artistName)
+    }
+
+    private fun getArtistName() = intent.getStringExtra(ARTIST_NAME_EXTRA) ?: throw Exception("Missing artist name")
 
     private fun updateArtistBiographyInfo(uiState: MoreDetailsUIState){
         runOnUiThread {
-            updateArtistBiographyText(uiState.biographyText)
+            updateArtistBiographyText(uiState.biographyTextHtml)
             updateOpenUrlButtonListener(uiState.articleUrl)
+            updateLogoImage(uiState.logoUrl)
         }
     }
 
-    private fun updateArtistBiographyText(biographyText: String){
-        articleTextView.text = Html.fromHtml(biographyText)
+    private fun updateArtistBiographyText(biographyTextHtml: String){
+        articleTextView.text = Html.fromHtml(biographyTextHtml)
     }
 
     private fun updateOpenUrlButtonListener(articleUrl: String){
@@ -78,10 +84,8 @@ class MoreDetailsActivity: Activity() {
         startActivity(intent)
     }
 
-    private fun showLogoImage(){
-        runOnUiThread {
-            Picasso.get().load(LASTFM_LOGO_URL).into(lastFMLogoImageView)
-        }
+    private fun updateLogoImage(url: String){
+        Picasso.get().load(url).into(lastFMLogoImageView)
     }
 
     companion object {

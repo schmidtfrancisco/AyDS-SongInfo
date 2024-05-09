@@ -19,7 +19,8 @@ private const val ARTICLE_URL = "url"
 
 internal class JsonToBiographyResolver: LastFMToBiographyResolver {
 
-    override fun getArtistBioFromExternalData(serviceData: String?,
+    override fun getArtistBioFromExternalData(
+        serviceData: String?,
         artistName: String
     ): ArtistBiography? =
         try {
