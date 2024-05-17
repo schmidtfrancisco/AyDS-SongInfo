@@ -15,19 +15,19 @@ private const val FOOTER = "</font></div></html>"
 internal class ArtistBiographyDescriptionHelperImpl: ArtistBiographyDescriptionHelper{
 
     override fun getBiographyText(artistBiography: Biography): String {
-        var biographyText = ""
-        var term: String? = null
 
-        when (artistBiography){
+        val htmlBiographyText = when (artistBiography){
             is ArtistBiography -> {
-                biographyText = getArtistBiographyText(artistBiography)
-                term = artistBiography.artistName
+                getArtistBiographyText(artistBiography)
+
             }
             else -> {
-                biographyText = "No results found"
+                val biographyText = "No results found"
+                val term = "No results"
+                textToHtml(biographyText, term)
             }
         }
-        return textToHtml(biographyText, term)
+        return htmlBiographyText
 
     }
 
@@ -37,15 +37,15 @@ internal class ArtistBiographyDescriptionHelperImpl: ArtistBiographyDescriptionH
         return textToHtml(parsedText, artistBiography.artistName)
     }
 
-    private fun textToHtml(text: String, term: String?): String {
+    private fun textToHtml(text: String, term: String): String {
         val builder = StringBuilder()
         builder.append(HEADER)
         val textWithBold = text
-            .replace("'", " ")
+            .replace("'", "")
             .replace("\n", "<br>")
             .replace(
                 "(?i)$term".toRegex(),
-                "<b>" + term!!.uppercase(Locale.getDefault()) + "</b>"
+                "<b>" + term.uppercase(Locale.getDefault()) + "</b>"
             )
         builder.append(textWithBold)
         builder.append(FOOTER)
