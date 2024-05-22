@@ -34,7 +34,7 @@ android {
 }
 
 dependencies {
-
+    implementation(project(":external"))
     implementation(project(":observer"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

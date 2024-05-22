@@ -12,51 +12,103 @@ class ArtistBiographyDescriptionHelperImplTest{
     @Test
     fun `given a local artist biography it should return adequate HTML`(){
         val artistBiography = ArtistBiography(
-            "Marcelo Martinez",
-            "Marcelo Martinez nacio en Japón era apodado 'chucho'.\\n" +
-                    "Marce vivió por más de 5 años en Buenos Aires.\\n" +
-                    "Martinez era un genio del rock nacional.\\n " +
-                    "Marcelo falleció en 1985",
-            "",
+            "artist",
+            "content",
+            "url",
             true
         )
 
         val result = artistBiographyDescriptionHelper.getBiographyText(artistBiography)
 
-        val expected =
-            "<html><div width=400><font face=\"arial\">" +
-                    "[*]<b>MARCELO MARTINEZ</b> nacio en Japón era apodado chucho.<br>" +
-                    "Marce vivió por más de 5 años en Buenos Aires.<br>" +
-                    "Martinez era un genio del rock nacional.<br> " +
-                    "Marcelo falleció en 1985" +
-                    "</font></div></html>"
-
-        assertEquals(expected, result)
+        assertEquals(
+            "<html><div width=400><font face=\"arial\">[*]content</font></div></html>",
+            result
+        )
     }
 
     @Test
-    fun `given a non-local artist biography it should return adequate HTML`(){
+    fun `given non-local artist biography it should return adequate HTML`(){
         val artistBiography = ArtistBiography(
-            "Marcelo Martinez",
-            "Marcelo Martinez nacio en Japón era apodado 'chucho'.\\n" +
-                    "Marce vivió por más de 5 años en Buenos Aires.\\n" +
-                    "Martinez era un genio del rock nacional.\\n " +
-                    "Marcelo falleció en 1985",
-            "",
+            "artist",
+            "content",
+            "url",
             false
         )
 
         val result = artistBiographyDescriptionHelper.getBiographyText(artistBiography)
 
-        val expected =
-            "<html><div width=400><font face=\"arial\">" +
-                    "<b>MARCELO MARTINEZ</b> nacio en Japón era apodado chucho.<br>" +
-                    "Marce vivió por más de 5 años en Buenos Aires.<br>" +
-                    "Martinez era un genio del rock nacional.<br> " +
-                    "Marcelo falleció en 1985" +
-                    "</font></div></html>"
+        assertEquals(
+            "<html><div width=400><font face=\"arial\">content</font></div></html>",
+            result
+        )
+    }
 
-        assertEquals(expected, result)
+    @Test
+    fun `given artist biography should remove apostrophes`(){
+        val artistBiography = ArtistBiography(
+            "artist",
+            "content's",
+            "url",
+            false
+        )
+
+        val result = artistBiographyDescriptionHelper.getBiographyText(artistBiography)
+
+        assertEquals(
+            "<html><div width=400><font face=\"arial\">contents</font></div></html>",
+            result
+        )
+    }
+
+    @Test
+    fun `given artist biography should replace double slash`(){
+        val artistBiography = ArtistBiography(
+            "artist",
+            "content\\n",
+            "url",
+            false
+        )
+
+        val result = artistBiographyDescriptionHelper.getBiographyText(artistBiography)
+
+        assertEquals(
+            "<html><div width=400><font face=\"arial\">content<br></font></div></html>",
+            result
+        )
+    }
+
+    @Test
+    fun `given artist biography should replace break lines`(){
+        val artistBiography = ArtistBiography(
+            "artist",
+            "content\n",
+            "url",
+            false
+        )
+
+        val result = artistBiographyDescriptionHelper.getBiographyText(artistBiography)
+
+        assertEquals(
+            "<html><div width=400><font face=\"arial\">content<br></font></div></html>",
+            result
+        )
+    }
+
+    @Test
+    fun `given artist biography should set artist name bold`(){
+        val artistBiography = ArtistBiography(
+            "artist",
+            "content artist",
+            "url",
+            false
+        )
+
+        val result = artistBiographyDescriptionHelper.getBiographyText(artistBiography)
+
+        assertEquals(
+            "<html><div width=400><font face=\"arial\">content <b>ARTIST</b></font></div></html>",
+            result
+        )
     }
 
     @Test

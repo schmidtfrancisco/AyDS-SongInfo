@@ -33,8 +33,7 @@ internal class ArtistBiographyDescriptionHelperImpl: ArtistBiographyDescriptionH
 
     private fun getArtistBiographyText(artistBiography: ArtistBiography): String{
         val text = (if (artistBiography.isLocallyStored) "[*]" else "") + artistBiography.content
-        val parsedText = text.replace("\\n", "\n")
-        return textToHtml(parsedText, artistBiography.artistName)
+        return textToHtml(text, artistBiography.artistName)
     }
 
     private fun textToHtml(text: String, term: String): String {
@@ -42,6 +41,7 @@ internal class ArtistBiographyDescriptionHelperImpl: ArtistBiographyDescriptionH
         builder.append(HEADER)
         val textWithBold = text
             .replace("'", "")
+            .replace("\\n", "\n")
             .replace("\n", "<br>")
             .replace(
                 "(?i)$term".toRegex(),

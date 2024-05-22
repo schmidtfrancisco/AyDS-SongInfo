@@ -39,6 +39,7 @@ internal class MoreDetailsPresenterImpl(
 
     private fun presentArtistBiography(artistBiography: ArtistBiography){
         uiState = uiState.copy(
+            artistName = artistBiography.artistName,
             biographyTextHtml = artistBiographyDescriptionHelper.getBiographyText(artistBiography),
             articleUrl = artistBiography.articleUrl,
         )
@@ -47,6 +48,7 @@ internal class MoreDetailsPresenterImpl(
 
     private fun presentEmptyBiography(){
         uiState = uiState.copy(
+            artistName = "",
             biographyTextHtml = artistBiographyDescriptionHelper.getBiographyText(),
             articleUrl = "",
         )

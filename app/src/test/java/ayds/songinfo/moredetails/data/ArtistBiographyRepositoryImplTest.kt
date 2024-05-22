@@ -58,6 +58,7 @@ class ArtistBiographyRepositoryImplTest {
 
         assertEquals(artistBiography, result)
         assertFalse(artistBiography.isLocallyStored)
+        verify(inverse = true) { lastFMLocalStorage.insertArtistBiography(artistBiography) }
     }
 
     @Test

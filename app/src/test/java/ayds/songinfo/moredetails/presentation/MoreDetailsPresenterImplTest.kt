@@ -23,14 +23,12 @@ class MoreDetailsPresenterImplTest {
         every { descriptionHelper.getBiographyText(biography) } returns "<html></html>"
 
         val uiStateTester: (MoreDetailsUIState) -> Unit = mockk(relaxed = true)
-        moreDetailsPresenter.uiStateObservable.subscribe{
-            uiStateTester(it)
-            assertEquals("", it.articleUrl)
-        }
+        moreDetailsPresenter.uiStateObservable.subscribe(uiStateTester)
 
         moreDetailsPresenter.getArtistInfo("artistName")
+        val result = MoreDetailsUIState("", "<html></html>", "")
 
-        verify { uiStateTester(moreDetailsPresenter.uiState) }
+        verify { uiStateTester(result) }
     }
 
     @Test
@@ -44,11 +42,10 @@ class MoreDetailsPresenterImplTest {
         every { descriptionHelper.getBiographyText(biography) } returns "<html>content</html>"
 
         val uiStateTester: (MoreDetailsUIState) -> Unit = mockk(relaxed = true)
-        moreDetailsPresenter.uiStateObservable.subscribe{
-            uiStateTester(it)
-        }
+        moreDetailsPresenter.uiStateObservable.subscribe(uiStateTester)
 
         moreDetailsPresenter.getArtistInfo("artistName")
+        val result = MoreDetailsUIState("artistName", "<html></html>", "url")
 
         verify { uiStateTester(moreDetailsPresenter.uiState) }
     }
