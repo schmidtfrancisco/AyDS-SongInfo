@@ -1,41 +1,52 @@
 package ayds.songinfo.moredetails.data
 
-import ayds.songinfo.moredetails.data.external.LastFMExternalService
-import ayds.songinfo.moredetails.data.local.LastFMLocalStorage
-import ayds.songinfo.moredetails.domain.ArtistBiographyRepository
-import ayds.songinfo.moredetails.domain.Biography
-import ayds.songinfo.moredetails.domain.Biography.EmptyBiography
-import ayds.songinfo.moredetails.domain.Biography.ArtistBiography
+import ayds.artist.external.lastfm.data.LastFMBiography.LastFMArtistBiography
+import ayds.artist.external.lastfm.data.LastFMExternalService
+import ayds.songinfo.moredetails.data.local.MoreDetailsLocalStorage
+import ayds.songinfo.moredetails.domain.InfoCard
+import ayds.songinfo.moredetails.domain.InfoCard.Card
+import ayds.songinfo.moredetails.domain.InfoCard.EmptyCard
+import ayds.songinfo.moredetails.domain.MoreDetailsRepository
+
 
 internal class ArtistBiographyRepositoryImpl(
-    private val lastFMLocalStorage: LastFMLocalStorage,
+    private val moreDetailsLocalStorage: MoreDetailsLocalStorage,
     private val lastFMExternalService: LastFMExternalService
-): ArtistBiographyRepository {
+): MoreDetailsRepository {
 
-    override fun getBiographyByArtistName(artistName: String): Biography {
-        var artistBiography = lastFMLocalStorage.getBiographyByArtistName(artistName)
+    override fun getCardByArtistName(artistName: String): InfoCard {
+        var card = moreDetailsLocalStorage.getCardByArtistName(artistName)
 
-        if (artistBiography != null) {
-            markArtistBiographyAsLocal(artistBiography)
+        if (card != null) {
+            markCardAsLocal(card)
         }
         else {
-            try {
-                artistBiography = lastFMExternalService.getArtistBiography(artistName)
+            val artistBiography = lastFMExternalService.getArtistBiography(artistName)
 
-                artistBiography?.let {
-                    if (it.content != LastFMExternalService.NO_CONTENT) {
-                        lastFMLocalStorage.insertArtistBiography(it)
-                    }
+            if (artistBiography is LastFMArtistBiography) {
+                card = artistBiography.toCard()
+
+                if (card.description != LastFMExternalService.NO_CONTENT) {
+                    moreDetailsLocalStorage.insertCard(card)
                 }
-            }catch (e: Exception){
-                artistBiography = null
+
             }
         }
-        return artistBiography ?: EmptyBiography
+        return card ?: EmptyCard
     }
 
-    private fun markArtistBiographyAsLocal(artistBiography: ArtistBiography){
-        artistBiography.isLocallyStored = true
+    private fun markCardAsLocal(card: Card){
+        card.isLocallyStored = true
     }
+
+    private fun LastFMArtistBiography.toCard(): Card =
+        Card(
+            this.artistName,
+            this.content,
+            this.articleUrl,
+            InfoCard.Source.LastFM,
+            this.logoUrl
+        )
+
 }
 

@@ -1,13 +1,11 @@
-package ayds.songinfo.moredetails.data.external
+package ayds.artist.external.lastfm.data
 
-import ayds.songinfo.moredetails.domain.Biography.ArtistBiography
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-
+import ayds.artist.external.lastfm.data.LastFMBiography.LastFMArtistBiography
 
 interface LastFMToBiographyResolver{
-    fun getArtistBioFromExternalData(serviceData: String?, artistName: String): ArtistBiography?
-
+    fun getArtistBioFromExternalData(serviceData: String?, artistName: String): LastFMArtistBiography?
 
 }
 
@@ -22,13 +20,9 @@ internal class JsonToBiographyResolver: LastFMToBiographyResolver {
     override fun getArtistBioFromExternalData(
         serviceData: String?,
         artistName: String
-    ): ArtistBiography? =
-        try {
-            serviceData?.getJsonObject()?.let {bio ->
-                ArtistBiography(artistName, bio.getContent(), bio.getArticleUrl() )
-            }
-        }catch (e: Exception){
-            null
+    ): LastFMArtistBiography? =
+        serviceData?.getJsonObject()?.let {bio ->
+            LastFMArtistBiography(artistName, bio.getContent(), bio.getArticleUrl() )
         }
 
     private fun String?.getJsonObject(): JsonObject {

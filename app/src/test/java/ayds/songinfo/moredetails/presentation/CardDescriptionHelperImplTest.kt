@@ -1,13 +1,13 @@
 package ayds.songinfo.moredetails.presentation
 
-import ayds.songinfo.moredetails.domain.Biography
-import ayds.songinfo.moredetails.domain.Biography.ArtistBiography
+import ayds.songinfo.moredetails.domain.Card
+import ayds.songinfo.moredetails.domain.Card.ArtistBiography
 import org.junit.Test
 import org.junit.Assert.assertEquals
 
-class ArtistBiographyDescriptionHelperImplTest{
+class CardDescriptionHelperImplTest{
 
-    private val artistBiographyDescriptionHelper = ArtistBiographyDescriptionHelperImpl()
+    private val artistBiographyDescriptionHelper = CardDescriptionHelperImpl()
 
     @Test
     fun `given a local artist biography it should return adequate HTML`(){
@@ -113,7 +113,7 @@ class ArtistBiographyDescriptionHelperImplTest{
 
     @Test
     fun `given no artist biography it should return adequate HTML`(){
-        val biography: Biography = Biography.EmptyBiography
+        val biography: Card = Card.EmptyBiography
 
         val result = artistBiographyDescriptionHelper.getBiographyText(biography)
 

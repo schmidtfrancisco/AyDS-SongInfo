@@ -1,8 +1,11 @@
 package ayds.songinfo.moredetails.presentation
 
+import ayds.songinfo.moredetails.domain.InfoCard
+
 data class MoreDetailsUIState(
     val artistName: String = "",
-    val biographyTextHtml: String = "",
+    val cardDescriptionHtml: String = "",
+    val cardSource: InfoCard.Source? = null,
     val articleUrl: String = "",
-    val logoUrl: String = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
+    val logoUrl: String = ""
 )
