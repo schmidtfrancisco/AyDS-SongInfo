@@ -34,7 +34,7 @@ internal class JsonToBiographyResolver: LastFMToBiographyResolver {
         val artist = this[ARTIST].getAsJsonObject()
         val biography = artist[BIOGRAPHY].getAsJsonObject()
         val extract = biography[CONTENT]
-        return extract?.asString ?: LastFMExternalService.NO_CONTENT
+        return extract?.asString ?: LastFMService.NO_CONTENT
     }
 
     private fun JsonObject.getArticleUrl(): String {

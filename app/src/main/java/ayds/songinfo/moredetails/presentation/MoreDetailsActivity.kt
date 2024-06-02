@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.text.Html
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -17,10 +18,10 @@ import com.squareup.picasso.Picasso
 class MoreDetailsActivity: Activity() {
 
     private lateinit var moreDetailsPresenter: MoreDetailsPresenter
-    private lateinit var articleTextView: TextView
-    private lateinit var sourceLabelTextView: TextView
-    private lateinit var openUrlButton: Button
-    private lateinit var lastFMLogoImageView: ImageView
+    private lateinit var cardDescriptionsTextView: List<TextView>
+    private lateinit var cardSourceLabelsTextView: List<TextView>
+    private lateinit var cardUrlButtons: List<Button>
+    private lateinit var cardLogosImageView: List<ImageView>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +31,8 @@ class MoreDetailsActivity: Activity() {
         initModule()
         initProperties()
         initObservers()
-        getArtistInfoAsync()
+        getArtistCardsAsync()
+
     }
 
     private fun initModule(){
@@ -39,50 +41,72 @@ class MoreDetailsActivity: Activity() {
     }
 
     private fun initProperties(){
-        articleTextView = findViewById(R.id.articleTextView)
-        sourceLabelTextView = findViewById(R.id.cardTextView)
-        openUrlButton = findViewById(R.id.openUrlButton)
-        lastFMLogoImageView = findViewById(R.id.lastFMLogoImageView)
+        cardDescriptionsTextView = listOf(
+            findViewById(R.id.card1DescriptionTextView),
+            findViewById(R.id.card2DescriptionTextView),
+            findViewById(R.id.card3DescriptionTextView)
+        )
+
+        cardSourceLabelsTextView = listOf(
+            findViewById(R.id.card1SourceTextView),
+            findViewById(R.id.card2SourceTextView),
+            findViewById(R.id.card3SourceTextView)
+        )
+
+        cardUrlButtons = listOf(
+            findViewById(R.id.card1UrlButton),
+            findViewById(R.id.card2UrlButton),
+            findViewById(R.id.card3UrlButton)
+        )
+
+        cardLogosImageView = listOf(
+            findViewById(R.id.card1LogoImageView),
+            findViewById(R.id.card2LogoImageView),
+            findViewById(R.id.card3LogoImageView)
+        )
     }
 
     private fun initObservers(){
         moreDetailsPresenter.uiStateObservable.
-        subscribe{value -> updateCardInfo(value)}
+        subscribe{value -> updateCardsUI(value)}
     }
 
-    private fun getArtistInfoAsync(){
+    private fun getArtistCardsAsync(){
         Thread{
-            getArtistInfo()
+            getArtistCards()
         }.start()
     }
 
-    private fun getArtistInfo(){
+    private fun getArtistCards(){
         val artistName = getArtistName()
-        moreDetailsPresenter.getArtistInfo(artistName)
+        moreDetailsPresenter.updateCard(artistName)
     }
 
     private fun getArtistName() = intent.getStringExtra(ARTIST_NAME_EXTRA) ?: throw Exception("Missing artist name")
 
-    private fun updateCardInfo(uiState: MoreDetailsUIState){
+    private fun updateCardsUI(uiState: List<CardUIState>){
         runOnUiThread {
-            updateCardDescription(uiState.cardDescriptionHtml)
-            updateCardSource(uiState.cardSource)
-            updateOpenUrlButtonListener(uiState.articleUrl)
-            updateLogoImage(uiState.logoUrl)
+            uiState.forEachIndexed { index, cardUIState ->
+                updateCardDescription(index, cardUIState.cardDescriptionHtml)
+                updateCardSource(index, cardUIState.cardSource)
+                updateCardUrlButtonListener(index, cardUIState.url)
+                updateCardLogoImage(index, cardUIState.logoUrl)
+            }
         }
     }
 
-    private fun updateCardDescription(biographyTextHtml: String){
-        articleTextView.text = Html.fromHtml(biographyTextHtml)
+    private fun updateCardDescription(index: Int, descriptionTextHtml: String){
+        cardDescriptionsTextView[index].text = Html.fromHtml(descriptionTextHtml)
     }
 
-    private fun updateCardSource(source: InfoCard.Source?){
-        sourceLabelTextView.text = source?.name ?: ""
+    private fun updateCardSource(index: Int,source: InfoCard.Source?){
+        cardSourceLabelsTextView[index].text = source?.name ?: ""
     }
 
-    private fun updateOpenUrlButtonListener(articleUrl: String){
-        openUrlButton.setOnClickListener {
-            navigateToUrl(articleUrl)
+    private fun updateCardUrlButtonListener(index: Int, url: String){
+        cardUrlButtons[index].visibility = View.VISIBLE
+        cardUrlButtons[index].setOnClickListener {
+            navigateToUrl(url)
         }
     }
 
@@ -92,8 +116,8 @@ class MoreDetailsActivity: Activity() {
         startActivity(intent)
     }
 
-    private fun updateLogoImage(url: String){
-        Picasso.get().load(url).into(lastFMLogoImageView)
+    private fun updateCardLogoImage(index: Int, url: String){
+        Picasso.get().load(url).into(cardLogosImageView[index])
     }
 
     companion object {

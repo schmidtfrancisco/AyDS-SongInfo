@@ -3,7 +3,7 @@ package ayds.artist.external.lastfm.data
 import ayds.artist.external.lastfm.data.LastFMBiography.LastFMEmptyBiography
 import retrofit2.Response
 
-interface LastFMExternalService {
+interface LastFMService {
 
     fun getArtistBiography(artistName: String): LastFMBiography
 
@@ -12,10 +12,10 @@ interface LastFMExternalService {
     }
 }
 
-internal class LastFMExternalServiceImpl(
+internal class LastFMServiceImpl(
     private val lastFMAPI: LastFMAPI,
     private val lastFMToBiographyResolver: LastFMToBiographyResolver
-): LastFMExternalService {
+): LastFMService {
 
     override fun getArtistBiography(artistName: String): LastFMBiography {
         return try {

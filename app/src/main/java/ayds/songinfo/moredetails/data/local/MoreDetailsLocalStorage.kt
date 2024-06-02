@@ -6,7 +6,7 @@ interface MoreDetailsLocalStorage {
 
     fun insertCard(card: Card)
 
-    fun getCardByArtistName(artistName: String): Card?
+    fun getCardsByArtistName(artistName: String): List<Card>
 }
 
 internal class MoreDetailsLocalStorageImpl(
@@ -18,21 +18,27 @@ internal class MoreDetailsLocalStorageImpl(
     override fun insertCard(card: Card) {
         cardDao.insertCard(card.toCardEntity())
     }
-    override fun getCardByArtistName(artistName: String): Card? {
-        return cardDao.getBiographyByArtistName(artistName)?.toCard()
+    override fun getCardsByArtistName(artistName: String): List<Card> {
+        val cards = cardDao.getCardByArtistName(artistName)
+        return cards.toCardList()
     }
 
     private fun Card.toCardEntity() = CardEntity(
         this.artistName,
         this.description,
         this.infoUrl,
-        this.source
+        this.source,
+        this.sourceLogoUrl
     )
 
-    private fun CardEntity.toCard() = Card(
-        this.artistName,
-        this.description,
-        this.infoUrl,
-        this.source
-    )
+    private fun List<CardEntity>.toCardList(): List<Card> {
+        return this.map { card -> Card(
+            card.artistName,
+            card.description,
+            card.infoUrl,
+            card.source,
+            card.logoUrl
+            )
+        }
+    }
 }

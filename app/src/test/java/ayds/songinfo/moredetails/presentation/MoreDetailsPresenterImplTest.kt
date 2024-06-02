@@ -21,11 +21,11 @@ class MoreDetailsPresenterImplTest {
         every { repository.getBiographyByArtistName("artistName") } returns biography
         every { descriptionHelper.getBiographyText(biography) } returns "<html></html>"
 
-        val uiStateTester: (MoreDetailsUIState) -> Unit = mockk(relaxed = true)
+        val uiStateTester: (CardUIState) -> Unit = mockk(relaxed = true)
         moreDetailsPresenter.uiStateObservable.subscribe(uiStateTester)
 
-        moreDetailsPresenter.getArtistInfo("artistName")
-        val result = MoreDetailsUIState("", "<html></html>", "")
+        moreDetailsPresenter.updateCard("artistName")
+        val result = CardUIState("", "<html></html>", "")
 
         verify { uiStateTester(result) }
     }
@@ -40,11 +40,11 @@ class MoreDetailsPresenterImplTest {
         every { repository.getBiographyByArtistName("artistName") } returns biography
         every { descriptionHelper.getBiographyText(biography) } returns "<html>content</html>"
 
-        val uiStateTester: (MoreDetailsUIState) -> Unit = mockk(relaxed = true)
+        val uiStateTester: (CardUIState) -> Unit = mockk(relaxed = true)
         moreDetailsPresenter.uiStateObservable.subscribe(uiStateTester)
 
-        moreDetailsPresenter.getArtistInfo("artistName")
-        val result = MoreDetailsUIState("artistName", "<html></html>", "url")
+        moreDetailsPresenter.updateCard("artistName")
+        val result = CardUIState("artistName", "<html></html>", "url")
 
         verify { uiStateTester(moreDetailsPresenter.uiState) }
     }

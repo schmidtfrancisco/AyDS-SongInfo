@@ -4,57 +4,43 @@ import ayds.observer.Observable
 import ayds.observer.Subject
 import ayds.songinfo.moredetails.domain.InfoCard
 import ayds.songinfo.moredetails.domain.InfoCard.Card
-import ayds.songinfo.moredetails.domain.InfoCard.EmptyCard
 import ayds.songinfo.moredetails.domain.MoreDetailsRepository
 
 interface MoreDetailsPresenter {
+    val uiStateObservable: Observable<MutableList<CardUIState>>
 
-    val uiState: MoreDetailsUIState
-    val uiStateObservable: Observable<MoreDetailsUIState>
-
-    fun getArtistInfo(artistName: String)
+    fun updateCard(artistName: String)
 }
 
 internal class MoreDetailsPresenterImpl(
     private val repository: MoreDetailsRepository,
     private val cardDescriptionHelper: CardDescriptionHelper
 ) : MoreDetailsPresenter {
+    override val uiStateObservable = Subject<MutableList<CardUIState>>()
 
-    override var uiState: MoreDetailsUIState = MoreDetailsUIState()
-    override val uiStateObservable = Subject<MoreDetailsUIState>()
-
-    override fun getArtistInfo(artistName: String) {
-        val card = repository.getCardByArtistName(artistName)
-        presentInfoCard(card)
+    override fun updateCard(artistName: String) {
+        val cards = repository.getCardsByArtistName(artistName)
+        presentCards(cards)
     }
 
-    private fun presentInfoCard(card: InfoCard){
-        when(card) {
-            is Card -> presentCard(card)
-            EmptyCard -> presentEmptyCard()
+    private fun presentCards(cards: List<InfoCard>){
+        val uiState: MutableList<CardUIState> = mutableListOf()
+
+        println(cards.isEmpty())
+
+        cards.forEach { card ->
+            if (card is Card){
+                val cardUiState = CardUIState(
+                    card.artistName,
+                    cardDescriptionHelper.getCardText(card),
+                    card.source,
+                    card.infoUrl,
+                    card.sourceLogoUrl
+                )
+                uiState.add(cardUiState)
+            }
         }
-    }
 
-    private fun presentCard(card: Card){
-        uiState = uiState.copy(
-            artistName = card.artistName,
-            cardSource = card.source,
-            cardDescriptionHtml = cardDescriptionHelper.getCardText(card),
-            articleUrl = card.infoUrl,
-            logoUrl = card.sourceLogoUrl
-        )
         uiStateObservable.notify(uiState)
     }
-
-    private fun presentEmptyCard(){
-        uiState = uiState.copy(
-            artistName = "",
-            cardDescriptionHtml = cardDescriptionHelper.getCardText(),
-            cardSource = InfoCard.Source.LastFM,
-            articleUrl = "",
-        )
-        uiStateObservable.notify(uiState)
-    }
-
-
 }

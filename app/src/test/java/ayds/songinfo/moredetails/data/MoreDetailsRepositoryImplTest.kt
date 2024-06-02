@@ -1,6 +1,6 @@
 package ayds.songinfo.moredetails.data
 
-import ayds.artist.external.lastfm.data.LastFMExternalService
+import ayds.artist.external.lastfm.data.LastFMService
 import ayds.songinfo.moredetails.data.local.MoreDetailsLocalStorage
 import ayds.songinfo.moredetails.domain.MoreDetailsRepository
 import ayds.songinfo.moredetails.domain.Card
@@ -14,13 +14,13 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 
 
-class ArtistBiographyRepositoryImplTest {
+class MoreDetailsRepositoryImplTest {
     private val moreDetailsLocalStorage: MoreDetailsLocalStorage = mockk(relaxUnitFun = true)
-    private val lastFMExternalService: LastFMExternalService = mockk(relaxUnitFun = true)
+    private val lastFMService: LastFMService = mockk(relaxUnitFun = true)
 
-    private val artistBiographyRepository: MoreDetailsRepository = ArtistBiographyRepositoryImpl(
+    private val artistBiographyRepository: MoreDetailsRepository = MoreDetailsRepositoryImpl(
         moreDetailsLocalStorage,
-        lastFMExternalService
+        lastFMService
     )
 
     @Test
@@ -38,7 +38,7 @@ class ArtistBiographyRepositoryImplTest {
     fun `given non-existing local biography should get the biography with content and store it `(){
         val artistBiography = ArtistBiography("artistName", "content", "url", false)
         every { moreDetailsLocalStorage.getBiographyByArtistName("artistName") } returns null
-        every { lastFMExternalService.getArtistBiography("artistName") } returns artistBiography
+        every { lastFMService.getArtistBiography("artistName") } returns artistBiography
 
         val result = artistBiographyRepository.getBiographyByArtistName("artistName")
 
@@ -50,9 +50,9 @@ class ArtistBiographyRepositoryImplTest {
 
     @Test
     fun `given non-existing local biography should get the biography with no content and not store it`(){
-        val artistBiography = ArtistBiography("artistName", LastFMExternalService.NO_CONTENT, "url", false)
+        val artistBiography = ArtistBiography("artistName", LastFMService.NO_CONTENT, "url", false)
         every { moreDetailsLocalStorage.getBiographyByArtistName("artistName") } returns null
-        every { lastFMExternalService.getArtistBiography("artistName") } returns artistBiography
+        every { lastFMService.getArtistBiography("artistName") } returns artistBiography
 
         val result = artistBiographyRepository.getBiographyByArtistName("artistName")
 
@@ -64,7 +64,7 @@ class ArtistBiographyRepositoryImplTest {
     @Test
     fun `given non-existing artist biography it should return EmptyBiography`(){
         every { moreDetailsLocalStorage.getBiographyByArtistName("artistName") } returns null
-        every { lastFMExternalService.getArtistBiography("artistName") } returns null
+        every { lastFMService.getArtistBiography("artistName") } returns null
 
         val result = artistBiographyRepository.getBiographyByArtistName("artistName")
 
@@ -74,7 +74,7 @@ class ArtistBiographyRepositoryImplTest {
     @Test
     fun `given service exception it should return EmptyBiography`(){
         every { moreDetailsLocalStorage.getBiographyByArtistName("artistName") } returns null
-        every { lastFMExternalService.getArtistBiography("artistName") } throws mockk<Exception>()
+        every { lastFMService.getArtistBiography("artistName") } throws mockk<Exception>()
 
         val result = artistBiographyRepository.getBiographyByArtistName("artistName")
 

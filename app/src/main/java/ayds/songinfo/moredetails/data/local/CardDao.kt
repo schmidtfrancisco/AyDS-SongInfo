@@ -8,8 +8,8 @@ import androidx.room.Query
 @Dao
 interface CardDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertCard(article: CardEntity)
+    fun insertCard(card: CardEntity)
 
-    @Query("SELECT * FROM Cardentity WHERE artistName LIKE :artistName LIMIT 1")
-    fun getBiographyByArtistName(artistName: String): CardEntity?
+    @Query("SELECT * FROM CardEntity WHERE artistName LIKE :artistName LIMIT 3")
+    fun getCardByArtistName(artistName: String): List<CardEntity>
 }
