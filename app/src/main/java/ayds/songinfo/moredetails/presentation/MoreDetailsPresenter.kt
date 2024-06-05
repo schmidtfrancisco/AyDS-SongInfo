@@ -26,8 +26,6 @@ internal class MoreDetailsPresenterImpl(
     private fun presentCards(cards: List<InfoCard>){
         val uiState: MutableList<CardUIState> = mutableListOf()
 
-        println(cards.isEmpty())
-
         cards.forEach { card ->
             if (card is Card){
                 val cardUiState = CardUIState(

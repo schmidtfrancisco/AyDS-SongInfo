@@ -1,24 +1,26 @@
 package ayds.songinfo.moredetails.presentation
 
-import ayds.songinfo.moredetails.domain.Card
-import ayds.songinfo.moredetails.domain.Card.ArtistBiography
-import org.junit.Test
+import ayds.songinfo.moredetails.domain.InfoCard
+import ayds.songinfo.moredetails.domain.InfoCard.Card
+import ayds.songinfo.moredetails.domain.InfoCard.Source
 import org.junit.Assert.assertEquals
+import org.junit.Test
 
 class CardDescriptionHelperImplTest{
 
-    private val artistBiographyDescriptionHelper = CardDescriptionHelperImpl()
+    private val cardDescriptionHelper = CardDescriptionHelperImpl()
 
     @Test
-    fun `given a local artist biography it should return adequate HTML`(){
-        val artistBiography = ArtistBiography(
+    fun `given a local card it should return adequate HTML`(){
+        val card = Card(
             "artist",
             "content",
             "url",
-            true
+            Source.Wikipedia,
+            isLocallyStored = true
         )
 
-        val result = artistBiographyDescriptionHelper.getBiographyText(artistBiography)
+        val result = cardDescriptionHelper.getCardText(card)
 
         assertEquals(
             "<html><div width=400><font face=\"arial\">[*]content</font></div></html>",
@@ -27,15 +29,16 @@ class CardDescriptionHelperImplTest{
     }
 
     @Test
-    fun `given non-local artist biography it should return adequate HTML`(){
-        val artistBiography = ArtistBiography(
+    fun `given non-local card it should return adequate HTML`(){
+        val card = Card(
             "artist",
             "content",
             "url",
-            false
+            Source.Wikipedia,
+            isLocallyStored = false
         )
 
-        val result = artistBiographyDescriptionHelper.getBiographyText(artistBiography)
+        val result = cardDescriptionHelper.getCardText(card)
 
         assertEquals(
             "<html><div width=400><font face=\"arial\">content</font></div></html>",
@@ -44,15 +47,16 @@ class CardDescriptionHelperImplTest{
     }
 
     @Test
-    fun `given artist biography should remove apostrophes`(){
-        val artistBiography = ArtistBiography(
+    fun `given card should remove apostrophes`(){
+        val card = Card(
             "artist",
             "content's",
             "url",
-            false
+            Source.Wikipedia,
+            isLocallyStored = false
         )
 
-        val result = artistBiographyDescriptionHelper.getBiographyText(artistBiography)
+        val result = cardDescriptionHelper.getCardText(card)
 
         assertEquals(
             "<html><div width=400><font face=\"arial\">contents</font></div></html>",
@@ -61,15 +65,16 @@ class CardDescriptionHelperImplTest{
     }
 
     @Test
-    fun `given artist biography should replace double slash`(){
-        val artistBiography = ArtistBiography(
+    fun `given card should replace double slash`(){
+        val card = Card(
             "artist",
             "content\\n",
             "url",
-            false
+            Source.Wikipedia,
+            isLocallyStored = false
         )
 
-        val result = artistBiographyDescriptionHelper.getBiographyText(artistBiography)
+        val result = cardDescriptionHelper.getCardText(card)
 
         assertEquals(
             "<html><div width=400><font face=\"arial\">content<br></font></div></html>",
@@ -78,15 +83,16 @@ class CardDescriptionHelperImplTest{
     }
 
     @Test
-    fun `given artist biography should replace break lines`(){
-        val artistBiography = ArtistBiography(
+    fun `given card should replace break lines`(){
+        val card = Card(
             "artist",
             "content\n",
             "url",
-            false
+            Source.Wikipedia,
+            isLocallyStored = false
         )
 
-        val result = artistBiographyDescriptionHelper.getBiographyText(artistBiography)
+        val result = cardDescriptionHelper.getCardText(card)
 
         assertEquals(
             "<html><div width=400><font face=\"arial\">content<br></font></div></html>",
@@ -95,15 +101,16 @@ class CardDescriptionHelperImplTest{
     }
 
     @Test
-    fun `given artist biography should set artist name bold`(){
-        val artistBiography = ArtistBiography(
+    fun `given card should set artist name bold`(){
+        val card = Card(
             "artist",
             "content artist",
             "url",
-            false
+            Source.Wikipedia,
+            isLocallyStored = false
         )
 
-        val result = artistBiographyDescriptionHelper.getBiographyText(artistBiography)
+        val result = cardDescriptionHelper.getCardText(card)
 
         assertEquals(
             "<html><div width=400><font face=\"arial\">content <b>ARTIST</b></font></div></html>",
@@ -112,10 +119,10 @@ class CardDescriptionHelperImplTest{
     }
 
     @Test
-    fun `given no artist biography it should return adequate HTML`(){
-        val biography: Card = Card.EmptyBiography
+    fun `given no card it should return adequate HTML`(){
+        val card: InfoCard = InfoCard.EmptyCard
 
-        val result = artistBiographyDescriptionHelper.getBiographyText(biography)
+        val result = cardDescriptionHelper.getCardText(card)
 
         val expected =
             "<html><div width=400><font face=\"arial\">" +
@@ -127,7 +134,7 @@ class CardDescriptionHelperImplTest{
 
     @Test
     fun `given no parameters it should return adequate HTML`(){
-        val result = artistBiographyDescriptionHelper.getBiographyText()
+        val result = cardDescriptionHelper.getCardText()
 
         val expected =
             "<html><div width=400><font face=\"arial\">" +

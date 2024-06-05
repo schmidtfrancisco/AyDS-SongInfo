@@ -8,16 +8,11 @@ import ayds.songinfo.moredetails.domain.InfoCard.Card
 import ayds.songinfo.moredetails.domain.InfoCard.EmptyCard
 import ayds.songinfo.moredetails.domain.InfoCard.Source
 
-interface LastFMProxy {
-
-    fun getLastFMCard(artistName: String): InfoCard
-}
-
 internal class LastFMProxyImpl(
     private val lastFMService: LastFMService
-):LastFMProxy {
+):CardProxy {
 
-    override fun getLastFMCard(artistName: String): InfoCard {
+    override fun getCard(artistName: String): InfoCard {
         return when (val biography = lastFMService.getArtistBiography(artistName)) {
             is LastFMArtistBiography ->
                 Card(

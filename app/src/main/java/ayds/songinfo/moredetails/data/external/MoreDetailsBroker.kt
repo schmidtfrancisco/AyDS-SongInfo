@@ -8,16 +8,10 @@ interface MoreDetailsBroker {
 }
 
 internal class MoreDetailsBrokerImpl(
-    private val lastFMProxy: LastFMProxy,
-    private val nyTimesProxy: NYTimesProxy,
-    private val wikipediaProxy: WikipediaProxy
+    private val proxies: List<CardProxy>
 ): MoreDetailsBroker {
 
     override fun getArtistCards(artistName: String): List<InfoCard> {
-        val lastFMCard = lastFMProxy.getLastFMCard(artistName)
-        val nyTimesCard = nyTimesProxy.getNYTimesCard(artistName)
-        val wikipediaCard = wikipediaProxy.getWikipediaCard(artistName)
-
-        return listOf(lastFMCard, nyTimesCard, wikipediaCard)
+        return proxies.map { it.getCard(artistName) }
     }
 }

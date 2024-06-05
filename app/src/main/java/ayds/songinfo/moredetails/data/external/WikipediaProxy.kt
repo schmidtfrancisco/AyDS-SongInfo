@@ -7,16 +7,11 @@ import ayds.songinfo.moredetails.domain.InfoCard.Card
 import ayds.songinfo.moredetails.domain.InfoCard.EmptyCard
 import ayds.songinfo.moredetails.domain.InfoCard.Source
 
-interface WikipediaProxy {
-
-    fun getWikipediaCard(artistName: String): InfoCard
-}
-
 internal class WikipediaProxyImpl(
     private val wikipediaTrackService: WikipediaTrackService
-): WikipediaProxy {
+): CardProxy {
 
-    override fun getWikipediaCard(artistName: String): InfoCard {
+    override fun getCard(artistName: String): InfoCard {
         return when (val article = wikipediaTrackService.getInfo(artistName)){
             is WikipediaArticle ->
                 Card(

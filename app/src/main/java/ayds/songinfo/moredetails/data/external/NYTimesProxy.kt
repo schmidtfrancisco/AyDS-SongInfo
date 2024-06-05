@@ -8,17 +8,11 @@ import ayds.songinfo.moredetails.domain.InfoCard.Card
 import ayds.songinfo.moredetails.domain.InfoCard.EmptyCard
 import ayds.songinfo.moredetails.domain.InfoCard.Source
 
-
-interface NYTimesProxy {
-
-    fun getNYTimesCard(artistName: String): InfoCard
-}
-
 internal class NYTimesProxyImpl(
     private val nyTimesService: NYTimesService
-): NYTimesProxy {
+): CardProxy {
 
-    override fun getNYTimesCard(artistName: String): InfoCard {
+    override fun getCard(artistName: String): InfoCard {
 
         return when (val article = nyTimesService.getArtistInfo(artistName)){
             is NYTimesArticleWithData ->
